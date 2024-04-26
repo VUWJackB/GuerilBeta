@@ -3,13 +3,17 @@ PImage blurredImg;
 PImage processedImg;
 
 int blurValue;
+int numLayers;
 
 Button testButt;
 Slider blurSlider;
-Slider thresholdSlider;
+Slider layersSlider;
+
+MultibandSlider mbSlider;
 
 void setup() {
     blurValue = 0;
+    numLayers = 3;
 
     size(1200, 800);
     testButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
@@ -18,7 +22,8 @@ void setup() {
         }
     };
     blurSlider = new Slider(10, 100, 0, 10, 172);
-    thresholdSlider = new Slider(10, 150, 0, 255, 172);
+    layersSlider = new Slider(10, 150, 1, 10, 172);
+    mbSlider = new MultibandSlider(10, 200, 172, 500, 0, 255, numLayers);
 }
 
 void draw() {
@@ -38,7 +43,14 @@ void draw() {
     rect(0, 0, 192, height);
     testButt.render();
     blurSlider.render();
-    thresholdSlider.render();
+
+    layersSlider.render();
+    if (layersSlider.getValue() != numLayers) {
+        numLayers = layersSlider.getValue();
+        mbSlider.setBands(numLayers);
+    }
+
+    mbSlider.render();
 }
 
 void fileSelected(File selection) {
@@ -56,8 +68,12 @@ void mouseClicked() {
 }
 
 void mouseDragged() {
+    mbSlider.slide();
     blurSlider.slide();
-    thresholdSlider.slide();
+    layersSlider.slide();
+}
+
+void mousePressed() {
 }
 
 PImage desaturate(PImage img) {
@@ -79,7 +95,7 @@ PImage posterise(PImage img, int levels) {
 
     for (int i = 0; i < img.pixels.length; i++) {
         float lum = red(img.pixels[i]);
-        if (lum < thresholdSlider.getValue()) {
+        if (lum < layersSlider.getValue()) {
             result.pixels[i] = color(0, 0, 0, alpha(img.pixels[i]) > 0 ? 255 : 0);
         } else {
             result.pixels[i] = color(200, 200, 200, alpha(img.pixels[i]) > 0 ? 255 : 0);
