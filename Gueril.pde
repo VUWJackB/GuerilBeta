@@ -1,5 +1,7 @@
 PImage originalImg;
 PImage blurredImg;
+PImage desaturatedImage;
+PImage[] posterisedLayers;
 PImage processedImg;
 
 int blurValue;
@@ -8,12 +10,13 @@ int numLayers;
 Button testButt;
 Slider blurSlider;
 Slider layersSlider;
-
 MultibandSlider mbSlider;
+
+boolean imageLoaded = true;
 
 void setup() {
     blurValue = 0;
-    numLayers = 3;
+    numLayers = 1;
 
     size(1200, 800);
     testButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
@@ -31,12 +34,11 @@ void draw() {
     noStroke();
     if (originalImg != null) {
         if (blurSlider.getValue() != blurValue) {
-            blurValue = blurSlider.getValue();
-            blurredImg = originalImg.get();
-            blurredImg.filter(BLUR, blurValue);
-            //println("updating blur");
+            updateBlur();
+            desaturatedImage = desaturate(blurredImg);
         }
-        image(posterise(desaturate(blurredImg), 1), 202, 10, originalImg.width, originalImg.height);
+
+        image(posterise(desaturatedImage), 202, 10, originalImg.width, originalImg.height);
     }
 
     fill(#CED4DA);
@@ -53,12 +55,19 @@ void draw() {
     mbSlider.render();
 }
 
+void updateBlur() {
+    blurValue = blurSlider.getValue();
+    blurredImg = originalImg.get();
+    blurredImg.filter(BLUR, blurValue);
+}
+
 void fileSelected(File selection) {
     if (selection == null) {
         println("Window was closed or the user hit cancel.");
     } else {
         originalImg = loadImage(selection.getAbsolutePath());
         blurredImg = originalImg.get();
+        desaturatedImage = desaturate(blurredImg);
     }
 }
 
@@ -90,7 +99,7 @@ PImage desaturate(PImage img) {
     return result;
 }
 
-PImage posterise(PImage img, int levels) {
+PImage posterise(PImage img) {
     PImage result = createImage(img.width, img.height, ARGB);
 
     for (int i = 0; i < img.pixels.length; i++) {
