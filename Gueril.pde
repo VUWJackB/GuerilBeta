@@ -19,6 +19,7 @@ void setup() {
     numLayers = 1;
 
     size(1200, 800);
+    frameRate(24);
     testButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
         public void action() {
             selectInput("Select an image to load:", "fileSelected");
@@ -35,10 +36,15 @@ void draw() {
     if (originalImg != null) {
         if (blurSlider.getValue() != blurValue) {
             updateBlur();
-            desaturatedImage = desaturate(blurredImg);
         }
+        for (PImage i : posterise(desaturatedImage)) {
+            image(i, 202, 10, originalImg.width, originalImg.height);
+        }
+    }
 
-        image(posterise(desaturatedImage), 202, 10, originalImg.width, originalImg.height);
+    if (layersSlider.getValue() != numLayers) {
+        numLayers = layersSlider.getValue();
+        mbSlider.setBands(numLayers);
     }
 
     fill(#CED4DA);
@@ -47,10 +53,6 @@ void draw() {
     blurSlider.render();
 
     layersSlider.render();
-    if (layersSlider.getValue() != numLayers) {
-        numLayers = layersSlider.getValue();
-        mbSlider.setBands(numLayers);
-    }
 
     mbSlider.render();
 }
@@ -59,6 +61,7 @@ void updateBlur() {
     blurValue = blurSlider.getValue();
     blurredImg = originalImg.get();
     blurredImg.filter(BLUR, blurValue);
+    desaturatedImage = desaturate(blurredImg).get();
 }
 
 void fileSelected(File selection) {
@@ -67,7 +70,8 @@ void fileSelected(File selection) {
     } else {
         originalImg = loadImage(selection.getAbsolutePath());
         blurredImg = originalImg.get();
-        desaturatedImage = desaturate(blurredImg);
+        desaturatedImage = blurredImg.get();
+
     }
 }
 
@@ -80,9 +84,6 @@ void mouseDragged() {
     mbSlider.slide();
     blurSlider.slide();
     layersSlider.slide();
-}
-
-void mousePressed() {
 }
 
 PImage desaturate(PImage img) {
@@ -99,17 +100,28 @@ PImage desaturate(PImage img) {
     return result;
 }
 
-PImage posterise(PImage img) {
-    PImage result = createImage(img.width, img.height, ARGB);
-
-    for (int i = 0; i < img.pixels.length; i++) {
-        float lum = red(img.pixels[i]);
-        if (lum < layersSlider.getValue()) {
-            result.pixels[i] = color(0, 0, 0, alpha(img.pixels[i]) > 0 ? 255 : 0);
-        } else {
-            result.pixels[i] = color(200, 200, 200, alpha(img.pixels[i]) > 0 ? 255 : 0);
+PImage[] posterise(PImage img) {
+    PImage[] layers = new PImage[numLayers];
+    for (int j = 0; j < numLayers; j++) {
+        PImage result = createImage(img.width, img.height, ARGB);
+        for (int i = 0; i < img.pixels.length; i++) {
+            float lum = red(img.pixels[i]);
+            if (j == 0) {
+                if (lum <= mbSlider.getValues()[j]) {
+                    result.pixels[i] = color(mbSlider.getColors()[j], mbSlider.getColors()[j], mbSlider.getColors()[j], alpha(img.pixels[i]) > 0 ? 255 : 0);
+                } else {
+                    result.pixels[i] = color(0, 0, 0, 0);
+                }
+            } else {
+                if (lum <= mbSlider.getValues()[j] && lum > mbSlider.getValues()[j - 1]) {
+                    result.pixels[i] = color(mbSlider.getColors()[j], mbSlider.getColors()[j], mbSlider.getColors()[j], alpha(img.pixels[i]) > 0 ? 255 : 0);
+                } else {
+                    result.pixels[i] = color(0, 0, 0, 0);
+                }
+            }
         }
+        layers[j] = result.get();
     }
 
-    return result;
+    return layers;
 }
