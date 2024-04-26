@@ -75,7 +75,6 @@ void fileSelected(File selection) {
     }
 }
 
-
 void mouseClicked() {
     testButt.click();
 }
@@ -102,25 +101,21 @@ PImage desaturate(PImage img) {
 
 PImage[] posterise(PImage img) {
     PImage[] layers = new PImage[numLayers];
-    for (int j = 0; j < numLayers; j++) {
-        PImage result = createImage(img.width, img.height, ARGB);
-        for (int i = 0; i < img.pixels.length; i++) {
-            float lum = red(img.pixels[i]);
-            if (j == 0) {
-                if (lum <= mbSlider.getValues()[j]) {
-                    result.pixels[i] = color(mbSlider.getColors()[j], mbSlider.getColors()[j], mbSlider.getColors()[j], alpha(img.pixels[i]) > 0 ? 255 : 0);
-                } else {
-                    result.pixels[i] = color(0, 0, 0, 0);
-                }
+    for (int i = 0; i < numLayers; i++) {
+        layers[i] = createImage(img.width, img.height, ARGB);
+    }
+
+    for (int i = 0; i < img.pixels.length; i++) {
+        float lum = red(img.pixels[i]);
+        for (int b = 0; b < numLayers; b++) {
+            if (lum < mbSlider.getValues()[b]) {
+                int bandColor = mbSlider.getColors()[b];
+                layers[b].pixels[i] = color(bandColor, bandColor, bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
+                break;
             } else {
-                if (lum <= mbSlider.getValues()[j] && lum > mbSlider.getValues()[j - 1]) {
-                    result.pixels[i] = color(mbSlider.getColors()[j], mbSlider.getColors()[j], mbSlider.getColors()[j], alpha(img.pixels[i]) > 0 ? 255 : 0);
-                } else {
-                    result.pixels[i] = color(0, 0, 0, 0);
-                }
+                layers[b].pixels[i] = color(0, 0, 0, 0);
             }
         }
-        layers[j] = result.get();
     }
 
     return layers;
