@@ -31,6 +31,10 @@ public class MultibandSlider {
         return output;
     }
 
+    public int getValue(int index) {
+        return (int) map(this.bandPos[index], 0, this.sHeight - 10, this.min, this.max);
+    }
+
     public int[] getColors() {
         return this.bandColor;
     }

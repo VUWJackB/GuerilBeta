@@ -11,16 +11,18 @@ int dragStartX, dragStartY;
 
 int blurValue;
 int numLayers;
+int[] thresholds;
 
-Button testButt;
+Button loadButt;
 Button saveButt;
 Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
 
-boolean imageLoaded = true;
-
 void setup() {
+    size(1200, 800);
+    frameRate(24);
+
     blurValue = 0;
     numLayers = 1;
 
@@ -28,49 +30,47 @@ void setup() {
     displayY = 10;
     displayScale = 1;
 
-    size(1200, 800);
-    frameRate(24);
-    testButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
+    originalImg = createImage(0, 0, ARGB);
+    blurredImg = createImage(0, 0, ARGB);
+    desaturatedImage = createImage(0, 0, ARGB);
+    posterisedLayers = new PImage[numLayers];
+    for (int i = 0; i < numLayers; i++) {
+        posterisedLayers[i] = createImage(0, 0, ARGB);
+    }
+
+    loadButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
         public void action() {
             selectInput("Select an image to load:", "fileSelected");
         }
     };
-    blurSlider = new Slider(10, 100, 0, 10, 172);
-    layersSlider = new Slider(10, 150, 1, 10, 172);
-    mbSlider = new MultibandSlider(10, 200, 172, 500, 0, 255, numLayers);
 
     saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710) {
         public void action() {
             if (originalImg != null) exportLayers(posterise(desaturatedImage));
         }
     };
+
+    blurSlider = new Slider(10, 100, 0, 10, 172);
+    layersSlider = new Slider(10, 150, 1, 10, 172);
+    mbSlider = new MultibandSlider(10, 200, 172, 500, 0, 255, numLayers);
+
+    thresholds = mbSlider.getValues();
 }
 
 void draw() {
     background(255);
     noStroke();
-    if (originalImg != null) {
-        if (blurSlider.getValue() != blurValue) {
-            updateBlur();
-        }
-        for (PImage i : posterise(desaturatedImage)) {
-            image(i, displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
-        }
-    }
 
-    if (layersSlider.getValue() != numLayers) {
-        numLayers = layersSlider.getValue();
-        mbSlider.setBands(numLayers);
-    }
+    updateStencil();
+
+    for (PImage i : posterisedLayers) image(i, displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
 
     fill(#CED4DA);
     rect(0, 0, 192, height);
-    testButt.render();
-    saveButt.render();
+
+    loadButt.render();
     blurSlider.render();
-
     layersSlider.render();
-
     mbSlider.render();
 
     fill(255);
@@ -78,11 +78,36 @@ void draw() {
     text("Layers #", 96, 140);
 }
 
+void updateStencil() {
+    if (blurSlider.getValue() != blurValue) {
+        blurValue = blurSlider.getValue();
+        updateBlur();
+        updatePosterisation();
+    }
+
+    if (layersSlider.getValue() != numLayers) {
+        numLayers = layersSlider.getValue();
+        mbSlider.setBands(numLayers);
+        thresholds = mbSlider.getValues();
+        updatePosterisation();
+    }
+
+    for (int i = 0; i < numLayers; i++) {
+        if (thresholds[i] != mbSlider.getValue(i)) {
+            thresholds[i] = mbSlider.getValue(i);
+            updatePosterisation();
+        }
+    }
+}
+
 void updateBlur() {
-    blurValue = blurSlider.getValue();
     blurredImg = originalImg.get();
     blurredImg.filter(BLUR, blurValue);
-    desaturatedImage = desaturate(blurredImg).get();
+    desaturatedImage = desaturate(blurredImg);
+}
+
+void updatePosterisation() {
+    posterisedLayers = posterise(desaturatedImage);
 }
 
 void fileSelected(File selection) {
@@ -91,13 +116,14 @@ void fileSelected(File selection) {
     } else {
         originalImg = loadImage(selection.getAbsolutePath());
         blurredImg = originalImg.get();
-        desaturatedImage = blurredImg.get();
-
+        blurredImg.filter(BLUR, blurValue);
+        desaturatedImage = desaturate(blurredImg);
+        posterisedLayers = posterise(desaturatedImage);
     }
 }
 
 void mouseClicked() {
-    testButt.click();
+    loadButt.click();
     saveButt.click();
 }
 
@@ -123,7 +149,7 @@ void mouseDragged() {
 
 
 void mouseWheel(MouseEvent event) {
-    if (mouseX > 202) displayScale += event.getCount() * -0.1;
+    if (mouseX > 202) displayScale += event.getCount() * -0.007;
 }
 
 PImage desaturate(PImage img) {
@@ -147,9 +173,8 @@ PImage[] posterise(PImage img) {
     int[] mbValues = mbSlider.getValues();
     int[] mbColors = mbSlider.getColors();
 
-    for (int i = 0; i < numLayers; i++) {
-        layers[i] = createImage(img.width, img.height, ARGB);
-    }
+    for (int i = 0; i < numLayers; i++) layers[i] = createImage(img.width, img.height, ARGB);
+
     int[] imgPixels = img.pixels; // Store image pixels array
     for (int i = 0; i < img.pixels.length; i++) {
         int lum = (imgPixels[i] >> 16) & 0xFF;
