@@ -13,6 +13,7 @@ int blurValue;
 int numLayers;
 
 Button testButt;
+Button saveButt;
 Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
@@ -37,6 +38,12 @@ void setup() {
     blurSlider = new Slider(10, 100, 0, 10, 172);
     layersSlider = new Slider(10, 150, 1, 10, 172);
     mbSlider = new MultibandSlider(10, 200, 172, 500, 0, 255, numLayers);
+
+    saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710) {
+        public void action() {
+            if (originalImg != null) exportLayers(posterise(desaturatedImage));
+        }
+    };
 }
 
 void draw() {
@@ -59,6 +66,7 @@ void draw() {
     fill(#CED4DA);
     rect(0, 0, 192, height);
     testButt.render();
+    saveButt.render();
     blurSlider.render();
 
     layersSlider.render();
@@ -86,6 +94,7 @@ void fileSelected(File selection) {
 
 void mouseClicked() {
     testButt.click();
+    saveButt.click();
 }
 
 void mousePressed() {
@@ -147,4 +156,17 @@ PImage[] posterise(PImage img) {
     }
 
     return layers;
+}
+
+void exportLayers(PImage[] layers) {
+    if (layers[0] != null) {
+        for (int i = 0; i < layers.length; i++) {
+            PGraphics output = createGraphics(layers[0].width, layers[0].height);
+            output.beginDraw();
+            output.background(0, 0); // Set the background with 0 alpha (fully transparent)
+            output.image(layers[i], 0, 0); // Draw your image onto the PGraphics
+            output.endDraw();
+            output.save("Layer_" + i + ".png");
+        }
+    }
 }
