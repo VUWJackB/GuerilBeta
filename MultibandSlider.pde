@@ -66,6 +66,14 @@ public class MultibandSlider {
 
     public void render() {
         for (int i = this.bandPos.length - 1; i >= 0; i--) {
+            if (mouseX > this.xPos && mouseX < this.xPos + this.sWidth) {
+                if (mouseY > this.yPos + ((i == 0) ? 0 : this.bandPos[i - 1]) && mouseY < this.yPos + this.bandPos[i]) {
+                    stroke(color(69, 130, 236));
+                    strokeWeight(5);
+                } else {
+                    noStroke();
+                }
+            }
             fill(color(bandColor[i]));
             rect(this.xPos, this.yPos, this.sWidth, this.bandPos[i]);
         }
