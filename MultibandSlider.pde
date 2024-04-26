@@ -31,6 +31,10 @@ public class MultibandSlider {
         return output;
     }
 
+    public int[] getColors() {
+        return this.bandColor;
+    }
+
     public void setBands(int bandNum) {
         this.bandPos = new int[bandNum];
         this.bandColor = new int[bandNum];
