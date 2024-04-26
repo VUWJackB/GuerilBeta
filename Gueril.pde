@@ -138,12 +138,17 @@ PImage desaturate(PImage img) {
 
 PImage[] posterise(PImage img) {
     PImage[] layers = new PImage[numLayers];
+    if (img == null) return layers;
+
+    int[] mbValues = mbSlider.getValues();
+    int[] mbColors = mbSlider.getColors();
+
     for (int i = 0; i < numLayers; i++) {
         layers[i] = createImage(img.width, img.height, ARGB);
     }
-
+    int[] imgPixels = img.pixels; // Store image pixels array
     for (int i = 0; i < img.pixels.length; i++) {
-        float lum = red(img.pixels[i]);
+        int lum = (imgPixels[i] >> 16) & 0xFF;
         for (int b = 0; b < numLayers; b++) {
             if (lum < mbSlider.getValues()[b]) {
                 int bandColor = mbSlider.getColors()[b];
