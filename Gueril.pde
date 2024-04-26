@@ -46,7 +46,7 @@ void setup() {
 
     saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710) {
         public void action() {
-            if (originalImg != null) exportLayers(posterise(desaturatedImage));
+            if (originalImg != null) exportLayers(posterisedLayers);
         }
     };
 
@@ -69,6 +69,8 @@ void draw() {
     rect(0, 0, 192, height);
 
     loadButt.render();
+    saveButt.render();
+
     blurSlider.render();
     layersSlider.render();
     mbSlider.render();
@@ -114,11 +116,19 @@ void fileSelected(File selection) {
     if (selection == null) {
         println("Window was closed or the user hit cancel.");
     } else {
-        originalImg = loadImage(selection.getAbsolutePath());
-        blurredImg = originalImg.get();
-        blurredImg.filter(BLUR, blurValue);
-        desaturatedImage = desaturate(blurredImg);
-        posterisedLayers = posterise(desaturatedImage);
+        String path = selection.getAbsolutePath();
+        String pathLower = path.toLowerCase();
+        if (pathLower.endsWith(".png")
+        || pathLower.endsWith(".jpg")
+        || pathLower.endsWith(".jpeg")
+        || pathLower.endsWith(".gif")
+        || pathLower.endsWith(".tga")) {
+            originalImg = loadImage(selection.getAbsolutePath());
+            blurredImg = originalImg.get();
+            blurredImg.filter(BLUR, blurValue);
+            desaturatedImage = desaturate(blurredImg);
+            posterisedLayers = posterise(desaturatedImage);
+        }
     }
 }
 
@@ -193,14 +203,15 @@ PImage[] posterise(PImage img) {
 }
 
 void exportLayers(PImage[] layers) {
-    if (layers[0] != null) {
-        for (int i = 0; i < layers.length; i++) {
-            PGraphics output = createGraphics(layers[0].width, layers[0].height);
-            output.beginDraw();
-            output.background(0, 0); // Set the background with 0 alpha (fully transparent)
-            output.image(layers[i], 0, 0); // Draw your image onto the PGraphics
-            output.endDraw();
-            output.save("Layer_" + i + ".png");
-        }
+    if (layers[0] == null) return;
+    if (layers[0].width == 0) return;
+    if (layers[0].height == 0) return;
+    for (int i = 0; i < layers.length; i++) {
+        PGraphics output = createGraphics(layers[0].width, layers[0].height);
+        output.beginDraw();
+        output.background(0, 0); // Set the background with 0 alpha (fully transparent)
+        output.image(layers[i], 0, 0); // Draw your image onto the PGraphics
+        output.endDraw();
+        output.save("Layer_" + i + ".png");
     }
 }
