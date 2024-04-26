@@ -2,7 +2,12 @@ PImage originalImg;
 PImage blurredImg;
 PImage desaturatedImage;
 PImage[] posterisedLayers;
-PImage processedImg;
+
+int displayX, displayY;
+int tempDisplayX, tempDisplayY;
+float displayScale;
+
+int dragStartX, dragStartY;
 
 int blurValue;
 int numLayers;
@@ -17,6 +22,10 @@ boolean imageLoaded = true;
 void setup() {
     blurValue = 0;
     numLayers = 1;
+
+    displayX = 202;
+    displayY = 10;
+    displayScale = 1;
 
     size(1200, 800);
     frameRate(24);
@@ -38,7 +47,7 @@ void draw() {
             updateBlur();
         }
         for (PImage i : posterise(desaturatedImage)) {
-            image(i, 202, 10, originalImg.width, originalImg.height);
+            image(i, displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
         }
     }
 
@@ -79,10 +88,29 @@ void mouseClicked() {
     testButt.click();
 }
 
+void mousePressed() {
+    if (mouseX > 202) {
+        tempDisplayX = displayX;
+        tempDisplayY = displayY;
+        dragStartX = mouseX;
+        dragStartY = mouseY;
+    }
+}
+
 void mouseDragged() {
     mbSlider.slide();
     blurSlider.slide();
     layersSlider.slide();
+
+    if (mouseX > 202) {
+        displayX = mouseX - dragStartX + tempDisplayX;
+        displayY = mouseY - dragStartY + tempDisplayY;
+    }
+}
+
+
+void mouseWheel(MouseEvent event) {
+    if (mouseX > 202) displayScale += event.getCount() * -0.1;
 }
 
 PImage desaturate(PImage img) {
