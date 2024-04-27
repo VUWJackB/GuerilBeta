@@ -20,6 +20,8 @@ Slider layersSlider;
 MultibandSlider mbSlider;
 
 void setup() {
+    PImage icon = loadImage("data/icon.png");
+    surface.setIcon(icon);
     size(1200, 800);
     frameRate(24);
 
