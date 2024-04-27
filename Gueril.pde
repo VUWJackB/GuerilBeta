@@ -72,6 +72,10 @@ void draw() {
     layersSlider.render();
 
     mbSlider.render();
+
+    fill(255);
+    text("Smoothness", 96, 90);
+    text("Layers #", 96, 140);
 }
 
 void updateBlur() {
