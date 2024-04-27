@@ -24,6 +24,8 @@ public class Button {
         this.yPos = y;
 
         this.message = text;
+
+        this.bFont = createFont("data/monofur.ttf", 24);
     }
 
     // litera theme
@@ -109,6 +111,7 @@ public class Button {
         rect(this.xPos, this.yPos, this.bWidth, this.bHeight);
 
         fill(255);
+        textFont(this.bFont, 24);
         text(this.message, this.xPos + (this.bWidth / 2), this.yPos + 24);
     }
 
