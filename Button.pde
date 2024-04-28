@@ -25,7 +25,7 @@ public class Button {
 
         this.message = text;
 
-        this.bFont = createFont("data/monofur.ttf", 24);
+        this.bFont = createFont("monofur.ttf", 24);
     }
 
     // litera theme
