@@ -47,3 +47,6 @@ For support, bug reports, or any other inquiries, please contact us at support@g
 Gueril is developed and maintained by [JackHasCamera](https://gitlab.com/JackHasCamera). 
 
 ![Gueril Logo](data/icon.png)
+
+If you find Gueril helpful, consider supporting its development by [buying me a coffee](https://buymeacoffee.com/jackhascamera)!
+
