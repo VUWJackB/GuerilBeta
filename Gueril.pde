@@ -19,6 +19,8 @@ Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
 
+SaveDialogue saveDialogue;
+
 void setup() {
     PImage icon = loadImage("icon.png");
     surface.setIcon(icon);
@@ -40,6 +42,8 @@ void setup() {
         posterisedLayers[i] = createImage(0, 0, ARGB);
     }
 
+    saveDialogue = new SaveDialogue();
+
     loadButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
         public void action() {
             selectInput("Select an image to load:", "fileSelected");
@@ -48,7 +52,7 @@ void setup() {
 
     saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710) {
         public void action() {
-            if (originalImg != null) exportLayers(posterisedLayers);
+            if (originalImg != null) exportLayers(posterisedLayers, saveDialogue.getSavePath());
         }
     };
 
@@ -160,7 +164,7 @@ void mouseDragged() {
 }
 
 
-void mouseWheel(MouseEvent event) {
+void mouseWheel(processing.event.MouseEvent event) {
     if (mouseX > 202) displayScale += event.getCount() * -0.007;
 }
 
@@ -204,7 +208,7 @@ PImage[] posterise(PImage img) {
     return layers;
 }
 
-void exportLayers(PImage[] layers) {
+void exportLayers(PImage[] layers, String path) {
     if (layers[0] == null) return;
     if (layers[0].width == 0) return;
     if (layers[0].height == 0) return;
@@ -214,6 +218,6 @@ void exportLayers(PImage[] layers) {
         output.background(0, 0); // Set the background with 0 alpha (fully transparent)
         output.image(layers[i], 0, 0); // Draw your image onto the PGraphics
         output.endDraw();
-        output.save("Layer_" + i + ".png");
+        output.save(path + "/Layer_" + i + ".png");
     }
 }
