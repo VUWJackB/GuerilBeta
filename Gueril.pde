@@ -25,6 +25,7 @@ void setup() {
     PImage icon = loadImage("icon.png");
     surface.setIcon(icon);
     size(1200, 800);
+    surface.setResizable(true);
     frameRate(24);
 
     blurValue = 0;
@@ -209,6 +210,7 @@ PImage[] posterise(PImage img) {
 }
 
 void exportLayers(PImage[] layers, String path) {
+    if (path == null) return;
     if (layers[0] == null) return;
     if (layers[0].width == 0) return;
     if (layers[0].height == 0) return;
@@ -216,7 +218,7 @@ void exportLayers(PImage[] layers, String path) {
         PGraphics output = createGraphics(layers[0].width, layers[0].height);
         output.beginDraw();
         output.background(0, 0); // Set the background with 0 alpha (fully transparent)
-        output.image(layers[i], 0, 0); // Draw your image onto the PGraphics
+        output.image(layers[i], 0, 0);
         output.endDraw();
         output.save(path + "/Layer_" + i + ".png");
     }
