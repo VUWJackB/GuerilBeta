@@ -11,12 +11,12 @@ public class Button {
 
     private String message;
 
-    public Button(String text, buttonType type, int x, int y) {
+    public Button(String text, buttonType type, int x, int y, int w) {
         textSize(24);
         textAlign(CENTER);
 
         this.bHeight = 30;
-        this.bWidth = (text.length() * 12) + 40;
+        this.bWidth = w;
 
         this.bType = type;
 

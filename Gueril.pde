@@ -15,6 +15,7 @@ int[] thresholds;
 
 Button loadButt;
 Button saveButt;
+Button donateButt;
 Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
@@ -45,15 +46,21 @@ void setup() {
 
     saveDialogue = new SaveDialogue();
 
-    loadButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10) {
+    loadButt = new Button("New Stencil", buttonType.PRIMARY, 10, 10, 172) {
         public void action() {
             selectInput("Select an image to load:", "fileSelected");
         }
     };
 
-    saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710) {
+    saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710, 172) {
         public void action() {
             if (originalImg != null) exportLayers(posterisedLayers, saveDialogue.getSavePath());
+        }
+    };
+
+    donateButt = new Button("Donate", buttonType.SECONDARY, 10, 750, 172) {
+        public void action() {
+            link("https://buymeacoffee.com/jackhascamera");
         }
     };
 
@@ -77,6 +84,7 @@ void draw() {
 
     loadButt.render();
     saveButt.render();
+    donateButt.render();
 
     blurSlider.render();
     layersSlider.render();
@@ -142,6 +150,7 @@ void fileSelected(File selection) {
 void mouseClicked() {
     loadButt.click();
     saveButt.click();
+    donateButt.click();
 }
 
 void mousePressed() {
