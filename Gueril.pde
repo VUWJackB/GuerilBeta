@@ -205,12 +205,19 @@ PImage[] posterise(PImage img) {
     for (int i = 0; i < img.pixels.length; i++) {
         int lum = (imgPixels[i] >> 16) & 0xFF;
         for (int b = 0; b < numLayers; b++) {
-            if (lum < mbSlider.getValues()[b]) {
-                int bandColor = mbSlider.getColors()[b];
-                layers[b].pixels[i] = color(bandColor, bandColor, bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
-                break;
+            int bandColor = mbColors[b];
+            if (b > 0) {
+                if (lum > mbValues[b - 1] && lum <= 255) {
+                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
+                } else {
+                    layers[b].pixels[i] = color(0, 0);
+                }
             } else {
-                layers[b].pixels[i] = color(0, 0, 0, 0);
+                if (lum >= 0 && lum <= 255) {
+                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
+                } else {
+                    layers[b].pixels[i] = color(0, 0);
+                }
             }
         }
     }
