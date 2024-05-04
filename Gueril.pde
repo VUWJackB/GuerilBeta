@@ -20,6 +20,9 @@ Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
 
+int visibleLayersOffset;
+EyeToggle[] visibleLayers;
+
 SaveDialogue saveDialogue;
 
 void setup() {
@@ -43,6 +46,10 @@ void setup() {
     for (int i = 0; i < numLayers; i++) {
         posterisedLayers[i] = createImage(0, 0, ARGB);
     }
+
+    visibleLayersOffset = 205;
+    visibleLayers = new EyeToggle[numLayers];
+    visibleLayers[0] = new EyeToggle(86, visibleLayersOffset, 10);
 
     saveDialogue = new SaveDialogue();
 
@@ -77,7 +84,11 @@ void draw() {
 
     updateStencil();
 
-    for (PImage i : posterisedLayers) image(i, displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
+    for (int i = 0; i < posterisedLayers.length; i++) {
+        if (visibleLayers[i].getState()) {
+            image(posterisedLayers[i], displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
+        }
+    }
 
     fill(#CED4DA);
     rect(0, 0, 192, height);
@@ -89,6 +100,10 @@ void draw() {
     blurSlider.render();
     layersSlider.render();
     mbSlider.render();
+
+    for (EyeToggle et : visibleLayers) {
+        et.render();
+    }
 
     fill(0);
     text("Smoothness", 96, 90);
@@ -106,12 +121,19 @@ void updateStencil() {
         numLayers = layersSlider.getValue();
         mbSlider.setBands(numLayers);
         thresholds = mbSlider.getValues();
+        visibleLayers = new EyeToggle[numLayers];
+        for (int pos = 0; pos < visibleLayers.length; pos++) {
+            visibleLayers[pos] = new EyeToggle(86, (pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset, 10);
+        }
         updatePosterisation();
     }
 
     for (int i = 0; i < numLayers; i++) {
         if (thresholds[i] != mbSlider.getValue(i)) {
             thresholds[i] = mbSlider.getValue(i);
+            for (int pos = 0; pos < visibleLayers.length; pos++) {
+                visibleLayers[pos].setY((pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset);
+            }
             updatePosterisation();
         }
     }
@@ -151,6 +173,9 @@ void mouseClicked() {
     loadButt.click();
     saveButt.click();
     donateButt.click();
+    for (EyeToggle et : visibleLayers) {
+        et.toggle();
+    }
 }
 
 void mousePressed() {

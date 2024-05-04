@@ -31,6 +31,10 @@ public class MultibandSlider {
         return output;
     }
 
+    public int[] getBandPos() {
+        return this.bandPos;
+    }
+
     public int getValue(int index) {
         return (int) map(this.bandPos[index], 0, this.sHeight - 10, this.min, this.max);
     }
@@ -57,11 +61,11 @@ public class MultibandSlider {
             for (int i = 0; i < this.bandPos.length - 1; i++) {
                 if (i != 0) {
                     if (mouseY > this.yPos + this.bandPos[i - 1] && mouseY < this.yPos + this.bandPos[i]) {
-                        bandPos[i] = constrain(mouseY - this.yPos + 10, this.bandPos[i - 1], this.bandPos[i + 1] -10);
+                        bandPos[i] = constrain(mouseY - this.yPos + 20, this.bandPos[i - 1], this.bandPos[i + 1] -20);
                     }
                 } else {
                     if (mouseY > this.yPos && mouseY < this.yPos + this.bandPos[i]) {
-                        bandPos[i] = constrain(mouseY - this.yPos + 10, 10, this.bandPos[i + 1] -10);
+                        bandPos[i] = constrain(mouseY - this.yPos + 20, 10, this.bandPos[i + 1] -20);
                     }
                 }
             }
