@@ -5,3 +5,4 @@ linux-arm/
 linux-amd64/
 linux-aarch64/
 .vscode/
+out/
