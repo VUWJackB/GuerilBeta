@@ -263,4 +263,10 @@ void exportLayers(PImage[] layers, String path) {
         output.endDraw();
         output.save(path + "/Layer_" + i + ".png");
     }
+    PGraphics output = createGraphics(layers[0].width, layers[0].height);
+    output.beginDraw();
+    output.background(0, 0); // Set the background with 0 alpha (fully transparent)
+    for (int i = 0; i < layers.length; i++) output.image(layers[i], 0, 0);
+    output.endDraw();
+    output.save(path + "/"+ "stencil.png");
 }
