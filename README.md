@@ -38,10 +38,6 @@ Contributions to Gueril are welcome! If you have ideas for new features, bug fix
 
 Gueril is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Support
-
-For support, bug reports, or any other inquiries, please contact us at support@guerilapp.com.
-
 ## About
 
 Gueril is developed and maintained by [JackHasCamera](https://gitlab.com/JackHasCamera). 
