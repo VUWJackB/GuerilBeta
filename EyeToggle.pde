@@ -23,15 +23,18 @@ public class EyeToggle {
 
     public void render() {
         if (this.open) {
-            stroke(255);
+            if (mouseX > this.xPos && mouseX < this.xPos + this.size * 2 && mouseY > this.yPos && mouseY < this.yPos + this.size) stroke(color(69, 130, 236));
+            else stroke(255);
             strokeWeight(5);
             noFill();
             arc(this.xPos + this.size, this.yPos + this.size / 2, this.size * 2, this.size, PI, PI * 2);
             noStroke();
-            fill(255);
+            if (mouseX > this.xPos && mouseX < this.xPos + this.size * 2 && mouseY > this.yPos && mouseY < this.yPos + this.size) fill(color(69, 130, 236));
+            else fill(255);
             ellipse(this.xPos + this.size, this.yPos + this.size / 2, this.size, this.size);
         } else {
-            stroke(255);
+            if (mouseX > this.xPos && mouseX < this.xPos + this.size * 2 && mouseY > this.yPos && mouseY < this.yPos + this.size) stroke(color(69, 130, 236));
+            else stroke(255);
             strokeWeight(5);
             noFill();
             arc(this.xPos + this.size, this.yPos + this.size / 2, this.size * 2, this.size, 0, PI);
