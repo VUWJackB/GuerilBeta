@@ -200,7 +200,7 @@ void mouseDragged() {
 
 
 void mouseWheel(processing.event.MouseEvent event) {
-    if (mouseX > 202) displayScale += event.getCount() * -0.007;
+    if (mouseX > 202) displayScale += event.getCount() * -0.05;
 }
 
 PImage desaturate(PImage img) {
@@ -233,13 +233,13 @@ PImage[] posterise(PImage img) {
             int bandColor = mbColors[b];
             if (b > 0) {
                 if (lum > mbValues[b - 1] && lum <= 255) {
-                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
+                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
                 } else {
                     layers[b].pixels[i] = color(0, 0);
                 }
             } else {
                 if (lum >= 0 && lum <= 255) {
-                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 0) ? 255 : 0);
+                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
                 } else {
                     layers[b].pixels[i] = color(0, 0);
                 }
