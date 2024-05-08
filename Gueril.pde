@@ -20,6 +20,9 @@ Slider blurSlider;
 Slider layersSlider;
 MultibandSlider mbSlider;
 
+boolean layerOrder;
+ToggleButton layerOrderButton;
+
 int visibleLayersOffset;
 EyeToggle[] visibleLayers;
 
@@ -59,13 +62,13 @@ void setup() {
         }
     };
 
-    saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 710, 172) {
+    saveButt = new Button("Save Layers", buttonType.PRIMARY, 10, 760, 172) {
         public void action() {
             if (originalImg != null) exportLayers(posterisedLayers, saveDialogue.getSavePath());
         }
     };
 
-    donateButt = new Button("Donate", buttonType.SECONDARY, 10, 750, 172) {
+    donateButt = new Button("Donate", buttonType.SECONDARY, 10, 800, 172) {
         public void action() {
             link("https://buymeacoffee.com/jackhascamera");
         }
@@ -74,6 +77,9 @@ void setup() {
     blurSlider = new Slider(10, 100, 0, 10, 172);
     layersSlider = new Slider(10, 150, 1, 10, 172);
     mbSlider = new MultibandSlider(10, 200, 172, 500, 0, 255, numLayers);
+
+    layerOrder = true;
+    layerOrderButton = new ToggleButton("Dark First", "Dark Last", 10, 710, 172);
 
     thresholds = mbSlider.getValues();
 }
@@ -84,9 +90,17 @@ void draw() {
 
     updateStencil();
 
-    for (int i = 0; i < posterisedLayers.length; i++) {
-        if (visibleLayers[i].getState()) {
-            image(posterisedLayers[i], displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
+    if (layerOrder) {
+        for (int i = 0; i < posterisedLayers.length; i++) {
+            if (visibleLayers[i].getState()) {
+                image(posterisedLayers[i], displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
+            }
+        }
+    } else {
+        for (int i = posterisedLayers.length - 1; i >= 0; i--) {
+            if (visibleLayers[i].getState()) {
+                image(posterisedLayers[i], displayX, displayY, originalImg.width * displayScale, originalImg.height * displayScale);
+            }
         }
     }
 
@@ -100,6 +114,8 @@ void draw() {
     blurSlider.render();
     layersSlider.render();
     mbSlider.render();
+
+    layerOrderButton.render();
 
     for (EyeToggle et : visibleLayers) {
         et.render();
@@ -125,6 +141,11 @@ void updateStencil() {
         for (int pos = 0; pos < visibleLayers.length; pos++) {
             visibleLayers[pos] = new EyeToggle(86, (pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset, 10);
         }
+        updatePosterisation();
+    }
+
+    if (layerOrder != layerOrderButton.getState()) {
+        layerOrder = layerOrderButton.getState();
         updatePosterisation();
     }
 
@@ -176,6 +197,7 @@ void mouseClicked() {
     for (EyeToggle et : visibleLayers) {
         et.toggle();
     }
+    layerOrderButton.click();
 }
 
 void mousePressed() {
@@ -229,16 +251,27 @@ PImage[] posterise(PImage img) {
     int[] imgPixels = img.pixels; // Store image pixels array
     for (int i = 0; i < img.pixels.length; i++) {
         int lum = (imgPixels[i] >> 16) & 0xFF;
-        for (int b = 0; b < numLayers; b++) {
-            int bandColor = mbColors[b];
-            if (b > 0) {
-                if (lum > mbValues[b - 1] && lum <= 255) {
-                    layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
+        if (layerOrderButton.getState()) { //Dark First
+            for (int b = 0; b < numLayers; b++) {
+                int bandColor = mbColors[b];
+                if (b > 0) {
+                    if (lum > mbValues[b - 1] && lum <= 255) {
+                        layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
+                    } else {
+                        layers[b].pixels[i] = color(0, 0);
+                    }
                 } else {
-                    layers[b].pixels[i] = color(0, 0);
+                    if (lum >= 0 && lum <= 255) {
+                        layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
+                    } else {
+                        layers[b].pixels[i] = color(0, 0);
+                    }
                 }
-            } else {
-                if (lum >= 0 && lum <= 255) {
+            }
+        } else { //Dark Last
+            for (int b = numLayers - 1; b >= 0; b--) {
+                int bandColor = mbColors[b];
+                if (lum < mbValues[b]) {
                     layers[b].pixels[i] = color(bandColor, (alpha(img.pixels[i]) > 150) ? 255 : 0);
                 } else {
                     layers[b].pixels[i] = color(0, 0);
@@ -266,7 +299,8 @@ void exportLayers(PImage[] layers, String path) {
     PGraphics output = createGraphics(layers[0].width, layers[0].height);
     output.beginDraw();
     output.background(0, 0); // Set the background with 0 alpha (fully transparent)
-    for (int i = 0; i < layers.length; i++) output.image(layers[i], 0, 0);
+    if (layerOrder) for (int i = 0; i < layers.length; i++) output.image(layers[i], 0, 0);
+    else for (int i = layers.length - 1; i >= 0; i--) output.image(layers[i], 0, 0);
     output.endDraw();
     output.save(path + "/"+ "stencil.png");
 }
