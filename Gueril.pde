@@ -26,6 +26,8 @@ ToggleButton layerOrderButton;
 int visibleLayersOffset;
 EyeToggle[] visibleLayers;
 
+PalletteButton[] colorSelectors;
+
 SaveDialogue saveDialogue;
 
 void setup() {
@@ -52,7 +54,10 @@ void setup() {
 
     visibleLayersOffset = 205;
     visibleLayers = new EyeToggle[numLayers];
-    visibleLayers[0] = new EyeToggle(86, visibleLayersOffset, 10);
+    visibleLayers[0] = new EyeToggle(71, visibleLayersOffset, 10);
+
+    colorSelectors = new PalletteButton[numLayers];
+    colorSelectors[0] = new PalletteButton(101, visibleLayersOffset - 2, color(0));
 
     saveDialogue = new SaveDialogue();
 
@@ -121,6 +126,10 @@ void draw() {
         et.render();
     }
 
+    for (PalletteButton pb : colorSelectors) {
+        pb.render();
+    }
+
     fill(0);
     text("Smoothness", 96, 90);
     text("Layers #", 96, 140);
@@ -138,8 +147,10 @@ void updateStencil() {
         mbSlider.setBands(numLayers);
         thresholds = mbSlider.getValues();
         visibleLayers = new EyeToggle[numLayers];
+        colorSelectors = new PalletteButton[numLayers];
         for (int pos = 0; pos < visibleLayers.length; pos++) {
-            visibleLayers[pos] = new EyeToggle(86, (pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset, 10);
+            visibleLayers[pos] = new EyeToggle(71, (pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset, 10);
+            colorSelectors[pos] = new PalletteButton(101, (pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset - 2, mbSlider.getColors()[pos]);
         }
         updatePosterisation();
     }
@@ -154,6 +165,7 @@ void updateStencil() {
             thresholds[i] = mbSlider.getValue(i);
             for (int pos = 0; pos < visibleLayers.length; pos++) {
                 visibleLayers[pos].setY((pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset);
+                colorSelectors[pos].setY((pos == 0 ? 0 : mbSlider.getBandPos()[pos - 1]) + visibleLayersOffset - 2);
             }
             updatePosterisation();
         }
@@ -196,6 +208,13 @@ void mouseClicked() {
     donateButt.click();
     for (EyeToggle et : visibleLayers) {
         et.toggle();
+    }
+    for (int c = 0; c < numLayers; c++) {
+        color oldColor = mbSlider.getColors()[c];
+        if (colorSelectors[c].click()) {
+            mbSlider.setColor(colorSelectors[c].getColor(), c);
+            updatePosterisation();
+        }
     }
     layerOrderButton.click();
 }

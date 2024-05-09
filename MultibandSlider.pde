@@ -56,6 +56,10 @@ public class MultibandSlider {
         }
     }
 
+    public void setColor(color newColor, int bandNum) {
+        this.bandColor[bandNum] = newColor;
+    }
+
     public void slide() {
         if (mouseX > this.xPos && mouseX < this.xPos + this.sWidth) {
             for (int i = 0; i < this.bandPos.length - 1; i++) {
