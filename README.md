@@ -16,7 +16,7 @@ Gueril is a desktop application designed to create stencils and screenprinting t
 
 ## Getting Started
 
-To get started with Gueril, simply download the latest release from the [releases page](https://gitlab.com/jackhascamera1/Gueril/-/releases) and install it. Once installed, launch the application and begin creating your stencils!
+To get started with Gueril, simply download the latest release from the [releases page](https://github.com/VUWJackB/GuerilBeta/releases) and install it. Once installed, launch the application and begin creating your stencils!
 
 ## How to Use
 
@@ -32,7 +32,7 @@ To get started with Gueril, simply download the latest release from the [release
 
 ## Contributing
 
-Contributions to Gueril are welcome! If you have ideas for new features, bug fixes, or improvements, feel free to open an issue or submit a pull request on the [Gitlab repository](https://gitlab.com/jackhascamera1/Gueril). 
+Contributions to Gueril are welcome! If you have ideas for new features, bug fixes, or improvements, feel free to open an issue or submit a pull request on the [Github repository](https://github.com/VUWJackB/GuerilBeta). 
 
 ## License
 
@@ -40,7 +40,7 @@ Gueril is licensed under the MIT License. See the [LICENSE](LICENSE) file for de
 
 ## About
 
-Gueril is developed and maintained by [JackHasCamera](https://gitlab.com/JackHasCamera). 
+Gueril is developed and maintained by [VUWJackB](https://github.com/VUWJackB). 
 
 ![Gueril Logo](data/icon.png)
 
